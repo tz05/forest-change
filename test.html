@@ -99,6 +99,8 @@
         <option value="DT.ag5.dif">DT change (age: 80-100)</option>
         <option value="DT.ag6.dif">DT change (age: 100-120)</option>
         <option value="DT.ag7.dif">DT change (age: &gt 120)</option>
+        <option value="PDSI.yr1">PDSI (1980s)</option>
+        <option value="PDSI.yr3">PDSI (2000s)</option>
       </select>
       </div>
       <div id="legend">
@@ -121,7 +123,7 @@
       var arrAgb = ['AGB.ag1.yr1','AGB.ag1.yr2','AGB.ag1.yr3','AGB.ag2.yr1','AGB.ag2.yr2','AGB.ag2.yr3','AGB.ag3.yr1','AGB.ag3.yr2','AGB.ag3.yr3',
                     'AGB.ag4.yr1','AGB.ag4.yr2','AGB.ag4.yr3','AGB.ag5.yr1','AGB.ag5.yr2','AGB.ag5.yr3','AGB.ag6.yr1','AGB.ag6.yr2','AGB.ag6.yr3',
                     'AGB.ag7.yr1','AGB.ag7.yr2','AGB.ag7.yr3'];
-      var arrPdsi = ['PDSI.yr1','PDSI.yr2','PDSI.yr3'];
+      var arrPdsi = ['PDSI.yr1','PDSI.yr3'];
       var arrDtDif = ['DT.ag1.dif','DT.ag2.dif','DT.ag3.dif','DT.ag4.dif','DT.ag5.dif','DT.ag6.dif','DT.ag7.dif'];
       var arrAgbDif = ['AGB.ag1.dif','AGB.ag2.dif','AGB.ag3.dif','AGB.ag4.dif','AGB.ag5.dif'];
       var arrPdsiDif = ['PDSI.dif'];
@@ -130,7 +132,7 @@
       var isDiff = false;
       function initMap() {
         map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4.7,
+          zoom: 5,
           center: new google.maps.LatLng(39,-83),
           mapTypeId: 'terrain'
         });
@@ -179,10 +181,12 @@
       }
 
       function updateMap() {
-        map.data.loadGeoJson('DT.geojson');
+        if(arrDt.includes(fld)||arrDtDif.includes(fld)) map.data.loadGeoJson('DT.geojson');
+        if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) map.data.loadGeoJson('PDSI.geojson');
         isDiff = false;
         if(arrDt.includes(fld)) {fldMin = 1.521; fldMax = 4.341;} // DT's range
         if(arrAgb.includes(fld)) {fldMin = 100; fldMax = 1000;} // AGB's range
+        if(arrPdsi.includes(fld)) {fldMin = -3; fldMax = 3;} // PDSI's range
         if(arrDtDif.includes(fld)) {
           isDiff = true;
           fldMin = -0.5; fldMax = 0.5; // d_DT's range
