@@ -192,6 +192,12 @@
           fldMin = -0.5; fldMax = 0.5; // d_DT's range
           fld2 = fld.replace('dif','yr3'); fld1 = fld.replace('dif','yr1');
         }
+        if(arrPdsiDif.includes(fld)) {
+          fl_json = 'PDSI.geojson';
+          isDiff = true;
+          fldMin = -3; fldMax = 3; // d_PDSI's range
+          fld2 = fld.replace('dif','yr3'); fld1 = fld.replace('dif','yr1');
+        }
         map.data.loadGeoJson(fl_json);
         document.getElementById('fld-min').textContent = fldMin;
         document.getElementById('fld-max').textContent = fldMax;
