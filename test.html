@@ -181,17 +181,18 @@
       }
 
       function updateMap() {
-        if(arrDt.includes(fld)||arrDtDif.includes(fld)) map.data.loadGeoJson('DT.geojson');
-        if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) map.data.loadGeoJson('PDSI.geojson');
+        var fl_json = NULL;
         isDiff = false;
-        if(arrDt.includes(fld)) {fldMin = 1.521; fldMax = 4.341;} // DT's range
-        if(arrAgb.includes(fld)) {fldMin = 100; fldMax = 1000;} // AGB's range
-        if(arrPdsi.includes(fld)) {fldMin = -3; fldMax = 3;} // PDSI's range
+        if(arrDt.includes(fld)) {fl_json = 'DT.geojson'; fldMin = 1.521; fldMax = 4.341;} // DT's range
+        if(arrAgb.includes(fld)) {fl_json = 'AGB.geojson'; fldMin = 100; fldMax = 1000;} // AGB's range
+        if(arrPdsi.includes(fld)) {fl_json = 'PDSI.geojson'; fldMin = -3; fldMax = 3;} // PDSI's range
         if(arrDtDif.includes(fld)) {
+          fl_json = 'DT.geojson';
           isDiff = true;
           fldMin = -0.5; fldMax = 0.5; // d_DT's range
           fld2 = fld.replace('dif','yr3'); fld1 = fld.replace('dif','yr1');
         }
+        map.data.loadGeoJson(fl_json);
         document.getElementById('fld-min').textContent = fldMin;
         document.getElementById('fld-max').textContent = fldMax;
         map.data.setStyle(styleFeature);
