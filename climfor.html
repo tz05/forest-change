@@ -166,7 +166,7 @@
           lng = parseInt(lng)-0.5;
           infoWindow.setPosition({lat:lat, lng:lng});
           var info = isDiff?(event.feature.getProperty(fld2)-event.feature.getProperty(fld1)):event.feature.getProperty(fld)
-          infoWindow.setContent('<b>'+lng+', '+lat+':</b><br>'+info.toFixed(3).concat("\n",info.toFixed(5)));
+          infoWindow.setContent('<b>'+lng+', '+lat+':</b><br>'+info.toFixed(1).concat("\n",info.toFixed(5)));
           infoWindow.open(map);
           var perc = (info-fldMin)/(fldMax-fldMin)*100;
           document.getElementById('data-caret').style.display = 'none';
