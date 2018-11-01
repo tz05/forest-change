@@ -30,7 +30,8 @@
         var layer = new google.maps.FusionTablesLayer({
           query: {
             select: 'lon',
-            from: '1lug5eyHKZGl89EFJujpLhB1SfYRS2IaecpNBUt56'
+            from: '1lug5eyHKZGl89EFJujpLhB1SfYRS2IaecpNBUt56',
+            where: 'lat >=36.5'
           }
         });
         layer.setMap(map);
