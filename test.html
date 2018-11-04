@@ -40,6 +40,9 @@
   <body>
     <div id="controls" class="nicebox">
       <select id="fld-name">
+        <option value="PDSI.yr1">PDSI (1980s)</option>
+        <option value="PDSI.yr3">PDSI (2000s)</option>
+        <option value="PDSI.dif">PDSI change</option>
         <option value="DT.ag1.yr1">DT (age: &lt 20 in 1980s)</option>
         <option value="DT.ag1.yr2">DT (age: &lt 20 in 1990s)</option>
         <option value="DT.ag1.yr3">DT (age: &lt 20 in 2000s)</option>
@@ -55,15 +58,31 @@
         <option value="DT.ag5.yr1">DT (age: 80-100 in 1980s)</option>
         <option value="DT.ag5.yr2">DT (age: 80-100 in 1990s)</option>
         <option value="DT.ag5.yr3">DT (age: 80-100 in 2000s)</option>
-        <option value="PDSI.yr1">PDSI (1980s)</option>
-        <option value="PDSI.yr3">PDSI (2000s)</option>
-        <option value="PDSI.dif">PDSI change</option>
-        <option value="AGB.ag1.yr1">AGB (age: &lt 20 in 1980s)</option>
-        <option value="DT.ag1.dif">DT change (age: &lt 20)</option>
+<!--        <option value="AGB.ag1.yr1">AGB (age: &lt 20 in 1980s)</option> -->
+        <option value="AGB.ag1.yr2">AGB (age: &lt 20 in 1990s)</option>
+        <option value="AGB.ag1.yr3">AGB (age: &lt 20 in 2000s)</option>
+        <option value="AGB.ag2.yr1">AGB (age: 20-40 in 1980s)</option>
+        <option value="AGB.ag2.yr2">AGB (age: 20-40 in 1990s)</option>
+        <option value="AGB.ag2.yr3">AGB (age: 20-40 in 2000s)</option>
+        <option value="AGB.ag3.yr1">AGB (age: 40-60 in 1980s)</option>
+        <option value="AGB.ag3.yr2">AGB (age: 40-60 in 1990s)</option>
+        <option value="AGB.ag3.yr3">AGB (age: 40-60 in 2000s)</option>
+        <option value="AGB.ag4.yr1">AGB (age: 60-80 in 1980s)</option>
+        <option value="AGB.ag4.yr2">AGB (age: 60-80 in 1990s)</option>
+        <option value="AGB.ag4.yr3">AGB (age: 60-80 in 2000s)</option>
+        <option value="AGB.ag5.yr1">AGB (age: 80-100 in 1980s)</option>
+        <option value="AGB.ag5.yr2">AGB (age: 80-100 in 1990s)</option>
+        <option value="AGB.ag5.yr3">AGB (age: 80-100 in 2000s)</option>
+<!--        <option value="DT.ag1.dif">DT change (age: &lt 20)</option> -->
         <option value="DT.ag2.dif">DT change (age: 20-40)</option>
         <option value="DT.ag3.dif">DT change (age: 40-60)</option>
         <option value="DT.ag4.dif">DT change (age: 60-80)</option>
         <option value="DT.ag5.dif">DT change (age: 80-100)</option>
+<!--        <option value="AGB.ag1.dif">AGB change (age: &lt 20)</option> -->
+        <option value="AGB.ag2.dif">AGB change (age: 20-40)</option>
+        <option value="AGB.ag3.dif">AGB change (age: 40-60)</option>
+        <option value="AGB.ag4.dif">AGB change (age: 60-80)</option>
+        <option value="AGB.ag5.dif">AGB change (age: 80-100)</option>
       </select>
     </div>
     <div id="map"></div>
@@ -77,8 +96,9 @@
       var arrAgbDif = ['AGB.ag1.dif','AGB.ag2.dif','AGB.ag3.dif','AGB.ag4.dif','AGB.ag5.dif'];
       var arrPdsiDif = ['PDSI.dif'];
 
-      var fld = fld2 = fld1 = spp_fld = null;   // spp_fld is for species composition information
-      var fustab = '19HkJh8m-fSAzdeankrQdek47_gqYVVckp1D3_s82';
+      var fld = spp_fld = null;   // spp_fld is for species composition information
+      var fiveColors = ['#D7191C','#FDAE61','#FFFFBF','#ABD9E9','#2C7BB6'];   // from 'red' to 'blue'
+      var fustab = '1ViwKbNjcskB9rRJbWYIkcjJC1kms24I7ZoNSeWvj';
       
       function initMap() {
         var where_clause;
@@ -89,7 +109,8 @@
           zoom: 4
         });
         fld = selectBox.options[selectBox.selectedIndex].value;
-        if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null; 
+        if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null;
+        else if(arrDtDif.includes(fld)||arrAgbDif.includes(fld)) spp_fld = fld.replace('DT','DIFF').replace('AGB','DIFF').replace('.dif','');
         else spp_fld = fld.replace('DT','SP').replace('AGB','SP');
         where_clause = '\''+spp_fld+'\' CONTAINS \'<table>\'';
         var layer = new google.maps.FusionTablesLayer({
@@ -103,15 +124,17 @@
         layer.setMap(map);
         
         google.maps.event.addListener(layer, 'click', function(e) {
-          infoWindow.setContent(e.row['lon'].value+' '+e.row['lat'].value+'<br>'+e.row[spp_fld].value);
+          infoWindow.setContent(e.row['lon'].value+' '+e.row['lat'].value+': '+Number(e.row[fld].value).toFixed(2)+'<br>'+e.row[spp_fld].value);
           infoWindow.setPosition(e.latLng);
           infoWindow.open(map);
         });
         google.maps.event.addDomListener(selectBox,'change',function() {
           fld = this.value;
-          if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null; 
+          if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null;
+          else if(arrDtDif.includes(fld)||arrAgbDif.includes(fld)) spp_fld = fld.replace('DT','DIFF').replace('AGB','DIFF').replace('.dif','');
           else spp_fld = fld.replace('DT','SP').replace('AGB','SP');
-          where_clause = '\''+spp_fld+'\' CONTAINS \'<table>\'';
+//          where_clause = '\''+spp_fld+'\' CONTAINS \'<table>\'';
+          where_clause = '\''+fld+'\' > -99999';
           applyStyle(map,layer,where_clause);
         });
       }
@@ -122,25 +145,31 @@
             from: fustab,    // fusion tables
             where: where_clause   // e.g., where: "'SP.ag3.yr1' CONTAINS '<table>'"
         };
+        layer.set('styles',fiveStyles(fld));
         layer.setMap(map);
-      }
-/*        var columnStyle = COLUMN_STYLES[column];
+        
+      function fiveStyles(fld_name) {   // turns out the current Fusion Tables can only support 5 colors in style settings!!!
+        var val_ranges;
         var styles = [];
-
-        for (var i in columnStyle) {
-          var style = columnStyle[i];
+        var where_clause;
+        var revOrder = false;   // the order of colors
+        if(arrDt.includes(fld_name)) {val_ranges = [-99999,2,2.5,3,3.5,99999]; revOrder = true;}
+        if(arrDtDif.includes(fld_name)) {val_ranges = [-99999,-0.3,-0.1,0.1,0.3,99999]; revOrder = true;}
+        if(arrAgb.includes(fld_name)) {val_ranges = [-99999,50,100,150,200,99999]; revOrder = false;}
+        if(arrAgbDif.includes(fld_name)) {val_ranges = [-99999,-60,-20,20,60,99999]; revOrder = false;}
+        if(arrPdsi.includes(fld_name)||arrPdsiDif.includes(fld_name)) {val_ranges = [-99999,-1.5,-0.5,0.5,1.5,99999]; revOrder = false;}
+        for(var i=0;i<5;i++) {
+          where_clause = '\''+fld_name+'\' > '+val_ranges[i]+' AND '+'\''+fld_name+'\' <= '+val_ranges[i+1];
           styles.push({
-            where: generateWhere(column, style.min, style.max),
+            where: where_clause,
             polygonOptions: {
-              fillColor: style.color,
-              fillOpacity: style.opacity ? style.opacity : 0.8
+              fillColor: (revOrder?fiveColors[4-i]:fiveColors[i]),
+              fillOpacity: 0.6
             }
           });
         }
-
-        layer.set('styles', styles);
+        return styles;
       }
-*/      
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvZvj7LZvJ_ksrRX1AswRUkfDg7pgW-Ps&callback=initMap">
