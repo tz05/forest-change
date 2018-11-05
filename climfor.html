@@ -121,10 +121,12 @@
             where: where_clause   //e.g., where: "'SP.ag3.yr1' CONTAINS '<table>'"
           }
         });
+        google.maps.event.trigger(selectBox,'change');
         layer.setMap(map);
         
         google.maps.event.addListener(layer, 'click', function(e) {
-          infoWindow.setContent(e.row['lon'].value+' '+e.row['lat'].value+': '+Number(e.row[fld].value).toFixed(2)+'<br>'+e.row[spp_fld].value);
+          if(spp_fld == null) infoWindow.setContent('<b>'+e.row['lon'].value+' '+e.row['lat'].value+':</b> '+Number(e.row[fld].value).toFixed(2));
+          else infoWindow.setContent('<b>'+e.row['lon'].value+' '+e.row['lat'].value+':</b> '+Number(e.row[fld].value).toFixed(2)+'<br>'+e.row[spp_fld].value);
           infoWindow.setPosition(e.latLng);
           infoWindow.open(map);
         });
@@ -147,6 +149,7 @@
         };
         layer.set('styles',fiveStyles(fld));
         layer.setMap(map);
+      }
         
       function fiveStyles(fld_name) {   // turns out the current Fusion Tables can only support 5 colors in style settings!!!
         var val_ranges;
