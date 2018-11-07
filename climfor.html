@@ -32,9 +32,27 @@
       top: 10px;
       left: 260px;
       width: 200px;
-      height: 45px;
-    }
-
+      height: 25px;
+      }
+      #legend {
+        background: #FFF;
+        padding: 5px;
+        margin: 3px;
+        font-size: 12px;
+        font-family: Arial, sans-serif;
+      }
+      .color {
+        border: 1px solid;
+        height: 12px;
+        width: 12px;
+        margin-right: 3px;
+        float: left;
+      }
+      .c1 {background: #D7191C;}
+      .c2 {background: #FDAE61;}
+      .c3 {background: #FFFFBF;}
+      .c4 {background: #ABD9E9;}
+      .c5 {background: #2C7BB6;}
     </style>
   </head>
   <body>
@@ -95,10 +113,10 @@
       var arrDtDif = ['DT.ag1.dif','DT.ag2.dif','DT.ag3.dif','DT.ag4.dif','DT.ag5.dif'];
       var arrAgbDif = ['AGB.ag1.dif','AGB.ag2.dif','AGB.ag3.dif','AGB.ag4.dif','AGB.ag5.dif'];
       var arrPdsiDif = ['PDSI.dif'];
-
       var fld = spp_fld = null;   // spp_fld is for species composition information
       var fiveColors = ['#D7191C','#FDAE61','#FFFFBF','#ABD9E9','#2C7BB6'];   // from 'red' to 'blue'
       var fustab = '1ViwKbNjcskB9rRJbWYIkcjJC1kms24I7ZoNSeWvj';
+      var legend_txt = [];
       
       function initMap() {
         var where_clause;
@@ -112,7 +130,7 @@
         if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null;
         else if(arrDtDif.includes(fld)||arrAgbDif.includes(fld)) spp_fld = fld.replace('DT','DIFF').replace('AGB','DIFF').replace('.dif','');
         else spp_fld = fld.replace('DT','SP').replace('AGB','SP');
-        where_clause = '\''+spp_fld+'\' CONTAINS \'<table>\'';
+        where_clause = '\''+fld+'\' > -99999';
         var layer = new google.maps.FusionTablesLayer({
           suppressInfoWindows: true,
           query: {
@@ -121,26 +139,55 @@
             where: where_clause   //e.g., where: "'SP.ag3.yr1' CONTAINS '<table>'"
           }
         });
-        google.maps.event.trigger(selectBox,'change');
-        layer.setMap(map);
-        
+        applyStyle(map,layer,where_clause);
+        var legendWrapper = document.createElement('div');
+        legendWrapper.id = 'legendWrapper';
+        legendWrapper.index = 1;
+        var legend = document.createElement('div');
+        legend.id = 'legend';
+        var content = [];
+        content.push('<p><div class="color c1"></div>'+legend_txt[0]+'</p>');
+        content.push('<p><div class="color c2"></div>'+legend_txt[1]+'</p>');
+        content.push('<p><div class="color c3"></div>'+legend_txt[2]+'</p>');
+        content.push('<p><div class="color c4"></div>'+legend_txt[3]+'</p>');
+        content.push('<p><div class="color c5"></div>'+legend_txt[4]+'</p>');
+        content.push('<h4>Click map\'s grid<br>cell for details</h4>');
+        legend.innerHTML = content.join('');
+        legendWrapper.appendChild(legend);
+        map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(legendWrapper);
+
         google.maps.event.addListener(layer, 'click', function(e) {
-          if(spp_fld == null) infoWindow.setContent('<b>'+e.row['lon'].value+' '+e.row['lat'].value+':</b> '+Number(e.row[fld].value).toFixed(2));
-          else infoWindow.setContent('<b>'+e.row['lon'].value+' '+e.row['lat'].value+':</b> '+Number(e.row[fld].value).toFixed(2)+'<br>'+e.row[spp_fld].value);
+          if(spp_fld == null) infoWindow.setContent('lon: '+e.row['lon'].value+', lat: '+e.row['lat'].value+'<br><b>'+Number(e.row[fld].value).toFixed(2)+'</b>');
+          else infoWindow.setContent('lon: '+e.row['lon'].value+', lat: '+e.row['lat'].value+'<br><b>'+Number(e.row[fld].value).toFixed(2)+'</b><br>'+e.row[spp_fld].value);
           infoWindow.setPosition(e.latLng);
           infoWindow.open(map);
         });
         google.maps.event.addDomListener(selectBox,'change',function() {
+          infoWindow.close(map);
           fld = this.value;
           if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null;
           else if(arrDtDif.includes(fld)||arrAgbDif.includes(fld)) spp_fld = fld.replace('DT','DIFF').replace('AGB','DIFF').replace('.dif','');
           else spp_fld = fld.replace('DT','SP').replace('AGB','SP');
-//          where_clause = '\''+spp_fld+'\' CONTAINS \'<table>\'';
           where_clause = '\''+fld+'\' > -99999';
           applyStyle(map,layer,where_clause);
+          var legendWrapper = document.getElementById('legendWrapper');
+          var legend = document.getElementById('legend');
+          legendWrapper.removeChild(legend);
+          var legend = document.createElement('div');
+          legend.id = 'legend';
+          var content = [];
+          content.push('<p><div class="color c1"></div>'+legend_txt[0]+'</p>');
+          content.push('<p><div class="color c2"></div>'+legend_txt[1]+'</p>');
+          content.push('<p><div class="color c3"></div>'+legend_txt[2]+'</p>');
+          content.push('<p><div class="color c4"></div>'+legend_txt[3]+'</p>');
+          content.push('<p><div class="color c5"></div>'+legend_txt[4]+'</p>');
+          if(arrAgb.includes(fld)||arrAgbDif.includes(fld)) content.push('<p>in Mg ha<sup>-1</sup></p>')
+          content.push('<h4>Click map\'s grid<br>cell for details</h4>');
+          legend.innerHTML = content.join('');
+          legendWrapper.appendChild(legend);
         });
       }
-
+      
       function applyStyle(map,layer,where_clause) {
         layer.query = {
             select: 'geometry',
@@ -162,6 +209,7 @@
         if(arrAgbDif.includes(fld_name)) {val_ranges = [-99999,-60,-20,20,60,99999]; revOrder = false;}
         if(arrPdsi.includes(fld_name)||arrPdsiDif.includes(fld_name)) {val_ranges = [-99999,-1.5,-0.5,0.5,1.5,99999]; revOrder = false;}
         for(var i=0;i<5;i++) {
+          legend_txt[i] = '('+val_ranges[i]+', '+val_ranges[i+1]+']';
           where_clause = '\''+fld_name+'\' > '+val_ranges[i]+' AND '+'\''+fld_name+'\' <= '+val_ranges[i+1];
           styles.push({
             where: where_clause,
@@ -171,6 +219,9 @@
             }
           });
         }
+        legend_txt[0] = '< '+val_ranges[1];
+        legend_txt[4] = '> '+val_ranges[4];
+        if(revOrder) legend_txt = legend_txt.reverse();
         return styles;
       }
     </script>
