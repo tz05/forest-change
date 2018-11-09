@@ -11,6 +11,10 @@
         margin: 0;
         padding: 0;
       }
+      table{
+        border: 1px solid green;
+        text-align: right;
+      }
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
       #map {
@@ -22,7 +26,7 @@
         font-family: "Roboto", "Arial", sans-serif;
         font-size: 13px;
         z-index: 5;
-        box-shadow: 0 4px 6px -4px #333;
+        box-shadow: 0 10px 5px -2px #333;
         padding: 5px 10px;
         background: rgb(255,255,255);
         background: linear-gradient(to bottom,rgba(255,255,255,1) 0%,rgba(245,245,245,1) 100%);
@@ -31,14 +35,15 @@
       #controls {
       top: 10px;
       left: 260px;
-      width: 200px;
-      height: 25px;
+      width: 225px;
+      height: 22px;
       }
       #legend {
-        background: #FFF;
+        box-shadow: 0 10px 3px -2px #333;
+        background: #EEE;
         padding: 5px;
-        margin: 3px;
-        font-size: 12px;
+        margin: 10px;
+        font-size: 14px;
         font-family: Arial, sans-serif;
       }
       .color {
@@ -61,6 +66,9 @@
         <option value="PDSI.yr1">PDSI (1980s)</option>
         <option value="PDSI.yr3">PDSI (2000s)</option>
         <option value="PDSI.dif">PDSI change</option>
+        <option value="GMON.yr1">Growing season length (1980s)</option>
+        <option value="GMON.yr3">Growing season length (2000s)</option>
+        <option value="GMON.dif">Change of growing season length</option>
         <option value="DT.ag1.yr1">DT (age: &lt 20 in 1980s)</option>
         <option value="DT.ag1.yr2">DT (age: &lt 20 in 1990s)</option>
         <option value="DT.ag1.yr3">DT (age: &lt 20 in 2000s)</option>
@@ -110,12 +118,14 @@
       var arrAgb = ['AGB.ag1.yr1','AGB.ag1.yr2','AGB.ag1.yr3','AGB.ag2.yr1','AGB.ag2.yr2','AGB.ag2.yr3','AGB.ag3.yr1','AGB.ag3.yr2',
                     'AGB.ag3.yr3','AGB.ag4.yr1','AGB.ag4.yr2','AGB.ag4.yr3','AGB.ag5.yr1','AGB.ag5.yr2','AGB.ag5.yr3'];
       var arrPdsi = ['PDSI.yr1','PDSI.yr3'];
+      var arrGmon = ['GMON.yr1','GMON.yr3'];
       var arrDtDif = ['DT.ag1.dif','DT.ag2.dif','DT.ag3.dif','DT.ag4.dif','DT.ag5.dif'];
       var arrAgbDif = ['AGB.ag1.dif','AGB.ag2.dif','AGB.ag3.dif','AGB.ag4.dif','AGB.ag5.dif'];
       var arrPdsiDif = ['PDSI.dif'];
+      var arrGmonDif = ['GMON.dif'];
       var fld = spp_fld = null;   // spp_fld is for species composition information
       var fiveColors = ['#D7191C','#FDAE61','#FFFFBF','#ABD9E9','#2C7BB6'];   // from 'red' to 'blue'
-      var fustab = '1ViwKbNjcskB9rRJbWYIkcjJC1kms24I7ZoNSeWvj';
+      var fustab = '1qwEiel_SO0RqSdA0261XreMG_bXMHdTQFj-fvlR8';
       var legend_txt = [];
       
       function initMap() {
@@ -127,7 +137,7 @@
           zoom: 4
         });
         fld = selectBox.options[selectBox.selectedIndex].value;
-        if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null;
+        if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)||arrGmon.includes(fld)||arrGmonDif.includes(fld)) spp_fld = null;
         else if(arrDtDif.includes(fld)||arrAgbDif.includes(fld)) spp_fld = fld.replace('DT','DIFF').replace('AGB','DIFF').replace('.dif','');
         else spp_fld = fld.replace('DT','SP').replace('AGB','SP');
         where_clause = '\''+fld+'\' > -99999';
@@ -165,7 +175,7 @@
         google.maps.event.addDomListener(selectBox,'change',function() {
           infoWindow.close(map);
           fld = this.value;
-          if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)) spp_fld = null;
+          if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)||arrGmon.includes(fld)||arrGmonDif.includes(fld)) spp_fld = null;
           else if(arrDtDif.includes(fld)||arrAgbDif.includes(fld)) spp_fld = fld.replace('DT','DIFF').replace('AGB','DIFF').replace('.dif','');
           else spp_fld = fld.replace('DT','SP').replace('AGB','SP');
           where_clause = '\''+fld+'\' > -99999';
@@ -181,7 +191,8 @@
           content.push('<p><div class="color c3"></div>'+legend_txt[2]+'</p>');
           content.push('<p><div class="color c4"></div>'+legend_txt[3]+'</p>');
           content.push('<p><div class="color c5"></div>'+legend_txt[4]+'</p>');
-          if(arrAgb.includes(fld)||arrAgbDif.includes(fld)) content.push('<p>in Mg ha<sup>-1</sup></p>')
+          if(arrAgb.includes(fld)||arrAgbDif.includes(fld)) content.push('<p><i>in Mg ha</i><sup>-1</sup></p>')
+          if(arrGmon.includes(fld)||arrGmonDif.includes(fld)) content.push('<p><i>in month</i></p>')
           content.push('<h4>Click map\'s grid<br>cell for details</h4>');
           legend.innerHTML = content.join('');
           legendWrapper.appendChild(legend);
@@ -208,6 +219,8 @@
         if(arrAgb.includes(fld_name)) {val_ranges = [-99999,50,100,150,200,99999]; revOrder = false;}
         if(arrAgbDif.includes(fld_name)) {val_ranges = [-99999,-30,-10,10,30,99999]; revOrder = false;}
         if(arrPdsi.includes(fld_name)||arrPdsiDif.includes(fld_name)) {val_ranges = [-99999,-1.5,-0.5,0.5,1.5,99999]; revOrder = false;}
+        if(arrGmon.includes(fld_name)) {val_ranges = [-99999,3,5,7,9,99999]; revOrder = true;}
+        if(arrGmonDif.includes(fld_name)) {val_ranges = [-99999,-0.6,-0.2,0.2,0.6,99999]; revOrder = true;}
         for(var i=0;i<5;i++) {
           legend_txt[i] = '('+val_ranges[i]+', '+val_ranges[i+1]+']';
           where_clause = '\''+fld_name+'\' > '+val_ranges[i]+' AND '+'\''+fld_name+'\' <= '+val_ranges[i+1];
