@@ -206,7 +206,7 @@
         if(arrDt.includes(fld_name)) {val_ranges = [-99999,2,2.5,3,3.5,99999]; revOrder = true;}
         if(arrDtDif.includes(fld_name)) {val_ranges = [-99999,-0.3,-0.1,0.1,0.3,99999]; revOrder = true;}
         if(arrAgb.includes(fld_name)) {val_ranges = [-99999,50,100,150,200,99999]; revOrder = false;}
-        if(arrAgbDif.includes(fld_name)) {val_ranges = [-99999,-60,-20,20,60,99999]; revOrder = false;}
+        if(arrAgbDif.includes(fld_name)) {val_ranges = [-99999,-30,-10,10,30,99999]; revOrder = false;}
         if(arrPdsi.includes(fld_name)||arrPdsiDif.includes(fld_name)) {val_ranges = [-99999,-1.5,-0.5,0.5,1.5,99999]; revOrder = false;}
         for(var i=0;i<5;i++) {
           legend_txt[i] = '('+val_ranges[i]+', '+val_ranges[i+1]+']';
