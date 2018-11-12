@@ -28,13 +28,13 @@
         z-index: 5;
         box-shadow: 0 10px 5px -2px #333;
         padding: 5px 10px;
-        background: rgb(255,255,255);
-        background: linear-gradient(to bottom,rgba(255,255,255,1) 0%,rgba(245,245,245,1) 100%);
-        border: rgb(229, 229, 229) 1px solid;
+        background: rgb(7,7,7);
+//        background: linear-gradient(to bottom,rgba(255,255,255,1) 0%,rgba(245,245,245,1) 100%);
+        border: rgb(229,229,229) 2px solid;
       }
       #controls {
-        top: 10px;
-        left: 260px;
+        top: 70px;
+        left: 10px;
         width: 225px;
         height: 40px;
       }
@@ -60,15 +60,14 @@
       .c5 {background: #2C7BB6;}
     </style>
   </head>
-  <body>
     <div id="controls" class="nicebox">
       <select id="fld-name">
-        <option value="PDSI.yr1">PDSI (1980s)</option>
-        <option value="PDSI.yr3">PDSI (2000s)</option>
-        <option value="PDSI.dif">PDSI change</option>
         <option value="GMON.yr1">Growing season length (1980s)</option>
         <option value="GMON.yr3">Growing season length (2000s)</option>
         <option value="GMON.dif">Change of growing season length</option>
+        <option value="PDSI.yr1">PDSI (1980s)</option>
+        <option value="PDSI.yr3">PDSI (2000s)</option>
+        <option value="PDSI.dif">PDSI change</option>
         <option value="DT.ag1.yr1">DT (age: &lt 20 in 1980s)</option>
         <option value="DT.ag1.yr2">DT (age: &lt 20 in 1990s)</option>
         <option value="DT.ag1.yr3">DT (age: &lt 20 in 2000s)</option>
@@ -111,7 +110,7 @@
         <option value="AGB.ag5.dif">AGB change (age: 80-100)</option>
       </select>
       <input type="checkbox" id="data-layer-check" checked>
-        <label><b>Show the layer</b></label>
+        <label><b><font color="white">Show the layer</font></b></label>
     </div>
     <div id="map"></div>
     <script>
@@ -140,6 +139,17 @@
           center: {lat: 39, lng: -91},
           zoom: 4.3
         });
+        var titleDiv = document.createElement('div');
+//        titleDiv.title = 'Composition and biomass change under climate variability in eastern U.S. forests';
+        titleDiv.innerHTML = '<h3>Composition and biomass change under climate variability in eastern U.S. forests</h3>';
+        titleDiv.style.backgroundColor = 'rgba(255,255,255,0.5)';
+        titleDiv.style.fontSize = '16px';
+        titleDiv.style.fontFamily = 'Impact,Charcoal,sans-serif';
+        titleDiv.style.color = 'rgb(25,25,25)';
+        titleDiv.style.paddingLeft = '10px';
+        titleDiv.style.paddingRight = '10px';
+        map.controls[google.maps.ControlPosition.TOP_CENTER].push(titleDiv);
+
         fld = selectBox.options[selectBox.selectedIndex].value;
         layerOn = checkbox.checked;
         if(arrPdsi.includes(fld)||arrPdsiDif.includes(fld)||arrGmon.includes(fld)||arrGmonDif.includes(fld)) spp_fld = null;
