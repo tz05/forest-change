@@ -140,12 +140,13 @@
           zoom: 4.3
         });
         var titleDiv = document.createElement('div');
-//        titleDiv.title = 'Composition and biomass change under climate variability in eastern U.S. forests';
-        titleDiv.innerHTML = '<h3>Composition and biomass change under climate variability in eastern U.S. forests</h3>';
-        titleDiv.style.backgroundColor = 'rgba(255,255,255,0.5)';
+        titleDiv.innerHTML = '<h3>Composition and biomass change under climate variability in eastern U.S. forests<div align="center" style="font-size:11px;font-family:verdana;"><a href="https://www.nature.com/articles/nature26152">Reference: Zhang et al. 2018 <i>Nature</i></a></div></h3>';
+        titleDiv.style.backgroundColor = 'rgba(255,255,255,0.7)';
+        //titleDiv.style.backgroundColor = 'rgba(255, 99, 71,0.7)';
         titleDiv.style.fontSize = '16px';
         titleDiv.style.fontFamily = 'Impact,Charcoal,sans-serif';
         titleDiv.style.color = 'rgb(25,25,25)';
+        //titleDiv.style.color = 'white';
         titleDiv.style.paddingLeft = '10px';
         titleDiv.style.paddingRight = '10px';
         map.controls[google.maps.ControlPosition.TOP_CENTER].push(titleDiv);
